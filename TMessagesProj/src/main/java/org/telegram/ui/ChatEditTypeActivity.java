@@ -43,6 +43,7 @@ import org.telegram.ui.Cells.LoadingCell;
 import org.telegram.ui.Cells.RadioButtonCell;
 import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextCell;
+import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.EditTextBoldCursor;
@@ -77,6 +78,9 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
 
     private LinearLayout savingContainer;
     private HeaderCell savingHeaderCell;
+    private TextCheckCell savingCheckCell;
+    private TextInfoPrivacyCell savingInfoCell;
+
 
     private TextCell manageLinksTextView;
     private TextInfoPrivacyCell manageLinksInfoCell;
@@ -396,7 +400,17 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
         linearLayout.addView(savingContainer, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
         savingHeaderCell = new HeaderCell(context, 23);
+        savingHeaderCell.setText(LocaleController.getString("GroupSavingContentTitle", R.string.GroupSavingContentTitle));
         savingContainer.addView(savingHeaderCell);
+
+        savingCheckCell = new TextCheckCell(context);
+        savingCheckCell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+        savingContainer.addView(savingCheckCell);
+
+        savingInfoCell = new TextInfoPrivacyCell(context);
+        savingInfoCell.setText(isChannel ? LocaleController.getString( "ChannelSavingContentInfo" , R.string.ChannelSavingContentInfo) : LocaleController.getString( "GroupSavingContentInfo" , R.string.GroupSavingContentInfo));
+        linearLayout.addView(savingInfoCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
 
 
         manageLinksTextView = new TextCell(context);
@@ -555,6 +569,7 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
             typeInfoCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteRedText4));
             linkContainer.setVisibility(View.GONE);
             savingContainer.setVisibility(View.GONE);
+            savingInfoCell.setVisibility(View.GONE);
             checkTextView.setVisibility(View.GONE);
             sectionCell2.setVisibility(View.GONE);
             adminedInfoCell.setVisibility(View.VISIBLE);
@@ -598,13 +613,15 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
             permanentLinkView.loadUsers(invite, chatId);
             checkTextView.setVisibility(!isPrivate && checkTextView.length() != 0 ? View.VISIBLE : View.GONE);
             if (isPrivate) {
+                savingCheckCell.setTextAndCheck(LocaleController.getString("RestrictSavingContent", R.string.RestrictSavingContent), true, false);
                 savingContainer.setVisibility(View.VISIBLE);
-                savingHeaderCell.setText(LocaleController.getString("GroupSavingContentTitle", R.string.GroupSavingContentTitle));
+                savingInfoCell.setVisibility(View.VISIBLE);
                 typeInfoCell.setBackgroundDrawable(Theme.getThemedDrawable(typeInfoCell.getContext(), R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                 manageLinksInfoCell.setBackground(Theme.getThemedDrawable(typeInfoCell.getContext(), R.drawable.greydivider_bottom, Theme.key_windowBackgroundGrayShadow));
                 manageLinksInfoCell.setText(LocaleController.getString("ManageLinksInfoHelp", R.string.ManageLinksInfoHelp));
             } else {
                 savingContainer.setVisibility(View.GONE);
+                savingInfoCell.setVisibility(View.GONE);
                 typeInfoCell.setBackgroundDrawable(checkTextView.getVisibility() == View.VISIBLE ? null : Theme.getThemedDrawable(typeInfoCell.getContext(), R.drawable.greydivider_bottom, Theme.key_windowBackgroundGrayShadow));
             }
         }

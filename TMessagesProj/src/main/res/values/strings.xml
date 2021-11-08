@@ -391,6 +391,9 @@
     <string name="ChannelLinkTitle">Permanent link</string>
     <string name="ChannelInviteLinkTitle">Invite Link</string>
     <string name="GroupSavingContentTitle">Saving content</string>
+    <string name="RestrictSavingContent">Restrict saving content</string>
+    <string name="GroupSavingContentInfo">Participants won\'t be able to forward messages from this group or save media files.</string>
+    <string name="ChannelSavingContentInfo">Participants won\'t be able to forward messages from this channel or save media files.</string>
     <string name="GroupAddMembers">Add Members</string>
     <string name="ChannelAddSubscribers">Add Subscribers</string>
     <string name="LeaveChannel">Leave Channel</string>
