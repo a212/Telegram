@@ -405,6 +405,12 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
 
         savingCheckCell = new TextCheckCell(context);
         savingCheckCell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+        savingCheckCell.setTextAndCheck(LocaleController.getString("RestrictSavingContent", R.string.RestrictSavingContent), currentChat.noforwards, false);
+        savingCheckCell.setOnClickListener(v -> {
+            currentChat.noforwards = !currentChat.noforwards;
+            ((TextCheckCell) v).setChecked(currentChat.noforwards);
+        });
+
         savingContainer.addView(savingCheckCell);
 
         savingInfoCell = new TextInfoPrivacyCell(context);
@@ -461,6 +467,7 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
     }
 
     private void processDone() {
+        saveNoForwards();
         if (trySetUsername()) {
             finishFragment();
         }
@@ -613,7 +620,6 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
             permanentLinkView.loadUsers(invite, chatId);
             checkTextView.setVisibility(!isPrivate && checkTextView.length() != 0 ? View.VISIBLE : View.GONE);
             if (isPrivate) {
-                savingCheckCell.setTextAndCheck(LocaleController.getString("RestrictSavingContent", R.string.RestrictSavingContent), true, false);
                 savingContainer.setVisibility(View.VISIBLE);
                 savingInfoCell.setVisibility(View.VISIBLE);
                 typeInfoCell.setBackgroundDrawable(Theme.getThemedDrawable(typeInfoCell.getContext(), R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
@@ -753,6 +759,17 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
             if (permanentLinkView != null) {
                 permanentLinkView.setLink(invite != null ? invite.link : null);
                 permanentLinkView.loadUsers(invite, chatId);
+            }
+        }));
+        getConnectionsManager().bindRequestToGuid(reqId, classGuid);
+    }
+
+    private void saveNoForwards() {
+        TLRPC.TL_messages_toggleNoForwards req = new TLRPC.TL_messages_toggleNoForwards();
+        req.enabled = currentChat.noforwards;
+        req.peer = getMessagesController().getInputPeer(-chatId);
+        final int reqId = getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+            if (error == null) {
             }
         }));
         getConnectionsManager().bindRequestToGuid(reqId, classGuid);
