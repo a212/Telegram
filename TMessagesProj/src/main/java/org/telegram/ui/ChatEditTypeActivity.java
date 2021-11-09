@@ -770,6 +770,10 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
         req.peer = getMessagesController().getInputPeer(-chatId);
         final int reqId = getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
             if (error == null) {
+                TLRPC.TL_messages_getFullChat req2 = new TLRPC.TL_messages_getFullChat();
+                req2.chat_id = chatId;
+                final int reqId2 = getConnectionsManager().sendRequest(req2, (response2, error2) -> AndroidUtilities.runOnUIThread(() -> {
+                }));
             }
         }));
         getConnectionsManager().bindRequestToGuid(reqId, classGuid);
