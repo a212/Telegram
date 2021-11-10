@@ -570,6 +570,7 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
         if (sectionCell2 == null) {
             return;
         }
+        boolean hideManageLinks = info != null && info.invitesCount > 0 && (isPrivate || currentChat.creator);
         if (!isPrivate && !canCreatePublic) {
             typeInfoCell.setText(LocaleController.getString("ChangePublicLimitReached", R.string.ChangePublicLimitReached));
             typeInfoCell.setTag(Theme.key_windowBackgroundWhiteRedText4);
@@ -613,8 +614,8 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
             }
             publicContainer.setVisibility(isPrivate ? View.GONE : View.VISIBLE);
             privateContainer.setVisibility(isPrivate ? View.VISIBLE : View.GONE);
-            manageLinksTextView.setVisibility(View.VISIBLE);
-            manageLinksInfoCell.setVisibility(View.VISIBLE);
+            manageLinksTextView.setVisibility(hideManageLinks ? View.GONE : View.VISIBLE);
+            manageLinksInfoCell.setVisibility(hideManageLinks ? View.GONE : View.VISIBLE);
             linkContainer.setPadding(0, 0, 0, isPrivate ? 0 : AndroidUtilities.dp(7));
             permanentLinkView.setLink(invite != null ? invite.link : null);
             permanentLinkView.loadUsers(invite, chatId);
@@ -623,8 +624,10 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
                 savingContainer.setVisibility(View.VISIBLE);
                 savingInfoCell.setVisibility(View.VISIBLE);
                 typeInfoCell.setBackgroundDrawable(Theme.getThemedDrawable(typeInfoCell.getContext(), R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
-                manageLinksInfoCell.setBackground(Theme.getThemedDrawable(typeInfoCell.getContext(), R.drawable.greydivider_bottom, Theme.key_windowBackgroundGrayShadow));
-                manageLinksInfoCell.setText(LocaleController.getString("ManageLinksInfoHelp", R.string.ManageLinksInfoHelp));
+                if (!hideManageLinks) {
+                    manageLinksInfoCell.setBackground(Theme.getThemedDrawable(typeInfoCell.getContext(), R.drawable.greydivider_bottom, Theme.key_windowBackgroundGrayShadow));
+                    manageLinksInfoCell.setText(LocaleController.getString("ManageLinksInfoHelp", R.string.ManageLinksInfoHelp));
+                }
             } else {
                 savingContainer.setVisibility(View.GONE);
                 savingInfoCell.setVisibility(View.GONE);
@@ -770,10 +773,6 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
         req.peer = getMessagesController().getInputPeer(-chatId);
         final int reqId = getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
             if (error == null) {
-                TLRPC.TL_messages_getFullChat req2 = new TLRPC.TL_messages_getFullChat();
-                req2.chat_id = chatId;
-                final int reqId2 = getConnectionsManager().sendRequest(req2, (response2, error2) -> AndroidUtilities.runOnUIThread(() -> {
-                }));
             }
         }));
         getConnectionsManager().bindRequestToGuid(reqId, classGuid);
