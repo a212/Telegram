@@ -6372,7 +6372,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         result.type.equals("gif") && (result.document != null || result.content != null) ||
                         result.type.equals("video") && (result.document != null/* || result.content_url != null*/))) {
                     ArrayList<Object> arrayList = botContextResults = new ArrayList<>(mentionsAdapter.getSearchResultBotContext());
-                    PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat.noforwards);
+                    PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat != null && currentChat.noforwards);
                     PhotoViewer.getInstance().openPhotoForSelect(arrayList, mentionsAdapter.getItemPosition(position), 3, false, botContextProvider, ChatActivity.this);
                 } else {
                     if (chatMode == MODE_SCHEDULED) {
@@ -12547,7 +12547,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         editButtonAnimation.start();
                     }
                 }
-                if (currentChat.noforwards) {
+                if (currentChat != null && currentChat.noforwards) {
                     if (forwardItem != null) {
                         forwardItem.setEnabled(false);
                         forwardItem.setAlpha(0.5f);
@@ -12568,7 +12568,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             }
         }
-        if (currentChat.noforwards) {
+        if (currentChat != null && currentChat.noforwards) {
             if (forwardButton != null) {
                 forwardButton.setEnabled(false);
                 forwardButton.setAlpha(0.5f);
@@ -12735,7 +12735,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     public void openVideoEditor(String videoPath, String caption) {
         if (getParentActivity() != null) {
             final Bitmap thumb = SendMessagesHelper.createVideoThumbnail(videoPath, MediaStore.Video.Thumbnails.MINI_KIND);
-            PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat.noforwards);
+            PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat != null && currentChat.noforwards);
             final ArrayList<Object> cameraPhoto = new ArrayList<>();
             MediaController.PhotoEntry entry = new MediaController.PhotoEntry(0, 0, 0, videoPath, 0, true, 0, 0, 0);
             entry.caption = caption;
@@ -12784,7 +12784,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (!file.exists()) {
             return;
         }
-        PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat.noforwards);
+        PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat != null && currentChat.noforwards);
         final ArrayList<Object> photos = new ArrayList<>();
         final MediaController.PhotoEntry entry = new MediaController.PhotoEntry(0, 0, 0, file.getAbsolutePath(), 0, object.isVideo(), 0, 0, 0);
         entry.caption = chatActivityEnterView.getFieldText();
@@ -19308,7 +19308,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
                 MessageObject message = MediaController.getInstance().getPlayingMessageObject();
                 if (message != null && message.isVideo()) {
-                    PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat.noforwards);
+                    PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat != null && currentChat.noforwards);
                     getFileLoader().setLoadingVideoForPlayer(message.getDocument(), false);
                     MediaController.getInstance().cleanupPlayer(true, true, false, true);
 
@@ -19544,7 +19544,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 currentChat != null && (ChatObject.isNotInChat(currentChat) && !isThreadChat() || ChatObject.isChannel(currentChat) && !ChatObject.canPost(currentChat) && !currentChat.megagroup || !ChatObject.canSendMessages(currentChat))) {
             allowChatActions = false;
         }
-        boolean isSavingRestricted = currentChat.noforwards;
+        boolean isSavingRestricted = currentChat != null && currentChat.noforwards;
         if (single || type < 2 || type == 20) {
             if (getParentActivity() == null) {
                 return;
@@ -22400,7 +22400,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (message.isVideo()) {
             sendSecretMessageRead(message, true);
         }
-        PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat.noforwards);
+        PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat != null && currentChat.noforwards);
         MessageObject playingObject = MediaController.getInstance().getPlayingMessageObject();
         if (cell != null && playingObject != null && playingObject.isVideo()) {
             getFileLoader().setLoadingVideoForPlayer(playingObject.getDocument(), false);
@@ -23123,7 +23123,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             }
                             boolean handled = false;
                             if (message.canPreviewDocument()) {
-                                PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat.noforwards);
+                                PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat != null && currentChat.noforwards);
                                 PhotoViewer.getInstance().openPhoto(message, ChatActivity.this, message.type != 0 ? dialog_id : 0, message.type != 0 ? mergeDialogId : 0, photoViewerProvider);
                                 handled = true;
                             }
@@ -23265,7 +23265,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     @Override
                     public void didClickImage(ChatActionCell cell) {
                         MessageObject message = cell.getMessageObject();
-                        PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat.noforwards);
+                        PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate, currentChat != null && currentChat.noforwards);
                         TLRPC.PhotoSize photoSize = FileLoader.getClosestPhotoSizeWithSize(message.photoThumbs, 640);
                         if (photoSize != null) {
                             ImageLocation imageLocation = ImageLocation.getForPhoto(photoSize, message.messageOwner.action.photo);

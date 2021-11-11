@@ -1438,12 +1438,6 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 if (currentChat.noforwards) {
                     forwardItem.setEnabled(false);
                     forwardItem.setAlpha(0.5f);
-                    ViewGroup view = (ViewGroup)forwardItem.getParent();
-                    Tooltip tooltip = new Tooltip(view.getContext(), view, 0xcc111111, Color.WHITE);
-                    boolean isChannel = ChatObject.isChannel(currentChat) && !currentChat.megagroup;
-                    tooltip.setText(isChannel ? LocaleController.getString("ChannelForwardsRestricted", R.string.ChannelForwardsRestricted)
-                            : LocaleController.getString("GroupForwardsRestricted", R.string.GroupForwardsRestricted));
-                    tooltip.show(forwardItem);
                 }
             }
 
@@ -4441,13 +4435,11 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         selectedMessagesCountTextView.setNumber(1, false);
         AnimatorSet animatorSet = new AnimatorSet();
         ArrayList<Animator> animators = new ArrayList<>();
+        View fwdView = null;
         for (int i = 0; i < actionModeViews.size(); i++) {
             View view2 = actionModeViews.get(i);
             if (!view2.isEnabled()) {
-                ViewGroup view3 = (ViewGroup)view2.getParent();
-                Tooltip tooltip = new Tooltip(view3.getContext(), view3, 0xcc111111, Color.WHITE);
-                tooltip.setText(LocaleController.getString("ChannelForwardsRestricted", R.string.ChannelForwardsRestricted));
-                tooltip.show(view3);
+                fwdView = view2;
             }
             AndroidUtilities.clearDrawableAnimation(view2);
             animators.add(ObjectAnimator.ofFloat(view2, View.SCALE_Y, 0.1f, 1.0f));
@@ -4472,6 +4464,15 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         if (!isActionModeShowed) {
             showActionMode(true);
         }
+        if (fwdView != null) {
+            ViewGroup p = (ViewGroup)fwdView.getParent();
+            Tooltip tooltip = new Tooltip(p.getContext(), p, 0xcc111111, Color.WHITE);
+            boolean isChannel = false;//ChatObject.isChannel(currentChat) && !currentChat.megagroup;
+            tooltip.setText(isChannel ? LocaleController.getString("ChannelForwardsRestricted", R.string.ChannelForwardsRestricted)
+                    : LocaleController.getString("GroupForwardsRestricted", R.string.GroupForwardsRestricted));
+            tooltip.show(fwdView);
+        }
+
 
         return true;
     }

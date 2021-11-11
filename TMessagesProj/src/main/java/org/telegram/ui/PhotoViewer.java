@@ -4672,6 +4672,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         bottomButtonsLayout.addView(shareButton, LayoutHelper.createFrame(50, LayoutHelper.MATCH_PARENT));
         shareButton.setOnClickListener(v -> onSharePressed());
         shareButton.setContentDescription(LocaleController.getString("ShareFile", R.string.ShareFile));
+        if (savingRestricted) {
+            shareButton.setEnabled(false);
+            shareButton.setAlpha(0.5f);
+        }
 
         nameTextView = new FadingTextViewLayout(containerView.getContext()) {
             @Override
@@ -9597,7 +9601,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 }).start();
             } else {
                 itemView.setVisibility(visible ? View.VISIBLE : View.GONE);
-                itemView.setAlpha(alpha);
+                if (itemView.isEnabled()) {
+                    itemView.setAlpha(alpha);
+                } else {
+                    itemView.setAlpha(0.5f);
+                }
             }
         }
     }

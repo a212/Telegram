@@ -97,6 +97,7 @@ public class MediaActivity extends BaseFragment implements SharedMediaLayout.Sha
                 lp = (LayoutParams) mediaCounterTextView.getLayoutParams();
                 lp.topMargin = textTop;
 
+
                 lp = (LayoutParams) avatarImageView.getLayoutParams();
                 lp.topMargin = (ActionBar.getCurrentActionBarHeight() - AndroidUtilities.dp(42)) / 2;
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
