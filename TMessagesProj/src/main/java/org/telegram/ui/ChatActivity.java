@@ -225,6 +225,7 @@ import org.telegram.ui.Components.SizeNotifierFrameLayout;
 import org.telegram.ui.Components.StickersAlert;
 import org.telegram.ui.Components.TextSelectionHint;
 import org.telegram.ui.Components.TextStyleSpan;
+import org.telegram.ui.Components.Tooltip;
 import org.telegram.ui.Components.TrendingStickersAlert;
 import org.telegram.ui.Components.TypefaceSpan;
 import org.telegram.ui.Components.URLSpanBotCommand;
@@ -12549,12 +12550,20 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (currentChat.noforwards) {
                     if (forwardItem != null) {
                         forwardItem.setEnabled(false);
+                        Tooltip tooltip = new Tooltip(contentView.getContext(), contentView, 0xcc111111, Color.WHITE);
+                        boolean isChannel = ChatObject.isChannel(currentChat) && !currentChat.megagroup;
+                        tooltip.setText(isChannel ? LocaleController.getString("ChannelForwardsRestricted", R.string.ChannelForwardsRestricted)
+                                : LocaleController.getString("GroupForwardsRestricted", R.string.GroupForwardsRestricted));
+                        tooltip.show(forwardItem);
+                        forwardItem.setAlpha(0.5f);
                     }
                     if (saveItem != null) {
                         saveItem.setEnabled(false);
+                        saveItem.setAlpha(0.5f);
                     }
                     if (copyItem != null) {
                         copyItem.setEnabled(false);
+                        copyItem.setAlpha(0.5f);
                     }
                 }
             }
@@ -12562,6 +12571,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (currentChat.noforwards) {
             if (forwardButton != null) {
                 forwardButton.setEnabled(false);
+                forwardButton.setAlpha(0.5f);
             }
         }
     }
