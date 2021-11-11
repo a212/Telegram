@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -1432,6 +1433,20 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             actionModeLayout.addView(forwardItem, new LinearLayout.LayoutParams(AndroidUtilities.dp(54), ViewGroup.LayoutParams.MATCH_PARENT));
             actionModeViews.add(forwardItem);
             forwardItem.setOnClickListener(v -> onActionBarItemClick(forward));
+            if (DialogObject.isChatDialog(preloader.dialogId)) {
+                TLRPC.Chat currentChat = preloader.parentFragment.getMessagesController().getChat(-preloader.dialogId);
+                if (currentChat.noforwards) {
+                    forwardItem.setEnabled(false);
+                    forwardItem.setAlpha(0.5f);
+                    ViewGroup view = (ViewGroup)forwardItem.getParent();
+                    Tooltip tooltip = new Tooltip(view.getContext(), view, 0xcc111111, Color.WHITE);
+                    boolean isChannel = ChatObject.isChannel(currentChat) && !currentChat.megagroup;
+                    tooltip.setText(isChannel ? LocaleController.getString("ChannelForwardsRestricted", R.string.ChannelForwardsRestricted)
+                            : LocaleController.getString("GroupForwardsRestricted", R.string.GroupForwardsRestricted));
+                    tooltip.show(forwardItem);
+                }
+            }
+
         }
         deleteItem = new ActionBarMenuItem(context, null, Theme.getColor(Theme.key_actionBarActionModeDefaultSelector), Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2), false);
         deleteItem.setIcon(R.drawable.msg_delete);
@@ -4428,6 +4443,12 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         ArrayList<Animator> animators = new ArrayList<>();
         for (int i = 0; i < actionModeViews.size(); i++) {
             View view2 = actionModeViews.get(i);
+            if (!view2.isEnabled()) {
+                ViewGroup view3 = (ViewGroup)view2.getParent();
+                Tooltip tooltip = new Tooltip(view3.getContext(), view3, 0xcc111111, Color.WHITE);
+                tooltip.setText(LocaleController.getString("ChannelForwardsRestricted", R.string.ChannelForwardsRestricted));
+                tooltip.show(view3);
+            }
             AndroidUtilities.clearDrawableAnimation(view2);
             animators.add(ObjectAnimator.ofFloat(view2, View.SCALE_Y, 0.1f, 1.0f));
         }
@@ -4451,6 +4472,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         if (!isActionModeShowed) {
             showActionMode(true);
         }
+
         return true;
     }
 
