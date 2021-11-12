@@ -361,6 +361,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private HintView voiceHintTextView;
     private HintView noSoundHintView;
     private HintView forwardHintView;
+    private HintView forwardRestrictionHintView;
     private ChecksHintView checksHintView;
     private View emojiButtonRed;
     private FrameLayout pinnedMessageView;
@@ -1916,6 +1917,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         mediaBanTooltip = null;
         noSoundHintView = null;
         forwardHintView = null;
+        forwardRestrictionHintView = null;
         checksHintView = null;
         textSelectionHint = null;
         emojiButtonRed = null;
@@ -9396,6 +9398,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (forwardHintView != null) {
             forwardHintView.hide();
         }
+        if (forwardRestrictionHintView != null) {
+            forwardRestrictionHintView.hide();
+        }
         if (pollHintView != null) {
             pollHintView.hide();
         }
@@ -9596,6 +9601,27 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             forwardHintView.setVisibility(View.INVISIBLE);
         }
         forwardHintView.showForMessageCell(cell, true);
+    }
+
+    private void showForwardRestrictionHint(View view, String msg) {
+        if (scrollingChatListView || chatListView == null || getParentActivity() == null || fragmentView == null) {
+            return;
+        }
+
+        if (forwardHintView == null) {
+            SizeNotifierFrameLayout frameLayout = (SizeNotifierFrameLayout) fragmentView;
+            int index = frameLayout.indexOfChild(chatActivityEnterView);
+            if (index == -1) {
+                return;
+            }
+            forwardHintView = new HintView(actionBar.getContext(), 4, themeDelegate);
+            forwardHintView.setAlpha(0.0f);
+            forwardHintView.setVisibility(View.INVISIBLE);
+            forwardHintView.setShowingDuration(4000);
+            contentView.addView(forwardHintView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 19, 0, 19, 0));
+        }
+        forwardHintView.setText(msg);
+        forwardHintView.showForView(view, true);
     }
 
     private void showTextSelectionHint(MessageObject messageObject) {
@@ -12553,9 +12579,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         forwardItem.setAlpha(0.5f);
                         Tooltip tooltip = new Tooltip(contentView.getContext(), contentView, 0xcc111111, Color.WHITE);
                         boolean isChannel = ChatObject.isChannel(currentChat) && !currentChat.megagroup;
-                        tooltip.setText(isChannel ? LocaleController.getString("ChannelForwardsRestricted", R.string.ChannelForwardsRestricted)
-                                : LocaleController.getString("GroupForwardsRestricted", R.string.GroupForwardsRestricted));
-                        tooltip.show(forwardItem);
+                        String msg = isChannel ? LocaleController.getString("ChannelForwardsRestricted", R.string.ChannelForwardsRestricted)
+                                : LocaleController.getString("GroupForwardsRestricted", R.string.GroupForwardsRestricted);
+                        showForwardRestrictionHint((View)forwardItem, msg);
                     }
                     if (saveItem != null) {
                         saveItem.setEnabled(false);
@@ -24837,6 +24863,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         themeDescriptions.add(new ThemeDescription(forwardHintView, ThemeDescription.FLAG_TEXTCOLOR, new Class[]{HintView.class}, new String[]{"textView"}, null, null, null, Theme.key_chat_gifSaveHintText));
         themeDescriptions.add(new ThemeDescription(forwardHintView, ThemeDescription.FLAG_TEXTCOLOR, new Class[]{HintView.class}, new String[]{"arrowImageView"}, null, null, null, Theme.key_chat_gifSaveHintBackground));
+
+        themeDescriptions.add(new ThemeDescription(forwardRestrictionHintView, ThemeDescription.FLAG_TEXTCOLOR, new Class[]{HintView.class}, new String[]{"textView"}, null, null, null, Theme.key_chat_gifSaveHintText));
+        themeDescriptions.add(new ThemeDescription(forwardRestrictionHintView, ThemeDescription.FLAG_TEXTCOLOR, new Class[]{HintView.class}, new String[]{"arrowImageView"}, null, null, null, Theme.key_chat_gifSaveHintBackground));
 
         themeDescriptions.add(new ThemeDescription(pagedownButtonCounter, ThemeDescription.FLAG_BACKGROUNDFILTER, null, null, null, null, Theme.key_chat_goDownButtonCounterBackground));
         themeDescriptions.add(new ThemeDescription(pagedownButtonCounter, ThemeDescription.FLAG_TEXTCOLOR, null, null, null, null, Theme.key_chat_goDownButtonCounter));
