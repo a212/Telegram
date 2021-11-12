@@ -329,6 +329,7 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
     private ImageView emojiButton1;
     @SuppressWarnings("FieldCanBeLocal")
     private ImageView emojiButton2;
+    private ImageView authorButton;
     private ImageView expandStickersButton;
     private EmojiView emojiView;
     private AnimatorSet panelAnimation;
@@ -1694,9 +1695,9 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
             @Override
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
                 super.onLayout(changed, left, top, right, bottom);
-                if (scheduledButton != null) {
+                if (authorButton != null) {
                     int x = getMeasuredWidth() - AndroidUtilities.dp(botButton != null && botButton.getVisibility() == VISIBLE ? 96 : 48) - AndroidUtilities.dp(48);
-                    scheduledButton.layout(x, scheduledButton.getTop(), x + scheduledButton.getMeasuredWidth(), scheduledButton.getBottom());
+                    authorButton.layout(x, authorButton.getTop(), x + authorButton.getMeasuredWidth(), authorButton.getBottom());
                 }
                 if (!animationParamsX.isEmpty()) {
                     for (int i = 0; i < getChildCount(); i++) {
@@ -1783,6 +1784,15 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
             }
         }
         setEmojiButtonImage(false, false);
+
+        authorButton = new ImageView(context);
+        authorButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_chat_messagePanelIcons), PorterDuff.Mode.MULTIPLY));
+        authorButton.setImageResource(R.drawable.input_attach);
+        authorButton.setScaleType(ImageView.ScaleType.CENTER);
+        if (Build.VERSION.SDK_INT >= 21) {
+            authorButton.setBackgroundDrawable(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
+        }
+        frameLayout.addView(authorButton, LayoutHelper.createFrame(48, 48, Gravity.BOTTOM | Gravity.LEFT, 3, 0, 0, 0));
 
         captionLimitView = new NumberTextView(context);
         captionLimitView.setVisibility(View.GONE);
