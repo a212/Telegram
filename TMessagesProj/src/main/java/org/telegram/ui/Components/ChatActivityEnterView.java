@@ -244,6 +244,8 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
     public BotCommandsMenuContainer botCommandsMenuContainer;
     private BotCommandsMenuView.BotCommandsAdapter botCommandsAdapter;
 
+    private ActionBarPopupWindow authorsMenu;
+
     private ValueAnimator searchAnimator;
     private float searchToOpenProgress;
 
@@ -324,12 +326,12 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
     private ActionBarPopupWindow sendPopupWindow;
     private ActionBarPopupWindow.ActionBarPopupWindowLayout sendPopupLayout;
     private ImageView cancelBotButton;
+    private ImageView authorButton;
     private ImageView[] emojiButton = new ImageView[2];
     @SuppressWarnings("FieldCanBeLocal")
     private ImageView emojiButton1;
     @SuppressWarnings("FieldCanBeLocal")
     private ImageView emojiButton2;
-    private ImageView authorButton;
     private ImageView expandStickersButton;
     private EmojiView emojiView;
     private AnimatorSet panelAnimation;
@@ -1691,13 +1693,31 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
         textFieldContainer.setPadding(0, AndroidUtilities.dp(1), 0, 0);
         addView(textFieldContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.BOTTOM, 0, 1, 0, 0));
 
+        if (true) {
+            FrameLayout authorLayout = new FrameLayout(context);
+            authorLayout.setClipChildren(false);
+            textFieldContainer.addView(authorLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM, 0, 0, 48, 0));
+            authorButton = new ImageView(context);
+            authorButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_chat_messagePanelIcons), PorterDuff.Mode.MULTIPLY));
+            authorButton.setImageResource(R.drawable.input_attach);
+            authorButton.setScaleType(ImageView.ScaleType.CENTER);
+            if (Build.VERSION.SDK_INT >= 21) {
+                authorButton.setBackgroundDrawable(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
+            }
+            authorLayout.addView(authorButton, LayoutHelper.createLinear(48, 48));
+            authorButton.setOnClickListener(v -> {
+                parentFragment.showAuthorsMenu();
+            });
+            authorButton.setContentDescription(LocaleController.getString("SendMessageAs", R.string.SendMessageAs));
+        }
+
         FrameLayout frameLayout = new FrameLayout(context) {
             @Override
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
                 super.onLayout(changed, left, top, right, bottom);
-                if (authorButton != null) {
+                if (scheduledButton != null) {
                     int x = getMeasuredWidth() - AndroidUtilities.dp(botButton != null && botButton.getVisibility() == VISIBLE ? 96 : 48) - AndroidUtilities.dp(48);
-                    authorButton.layout(x, authorButton.getTop(), x + authorButton.getMeasuredWidth(), authorButton.getBottom());
+                    scheduledButton.layout(x, scheduledButton.getTop(), x + scheduledButton.getMeasuredWidth(), scheduledButton.getBottom());
                 }
                 if (!animationParamsX.isEmpty()) {
                     for (int i = 0; i < getChildCount(); i++) {
@@ -1725,7 +1745,7 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
             }
         };
         frameLayout.setClipChildren(false);
-        textFieldContainer.addView(frameLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM, 0, 0, 48, 0));
+        textFieldContainer.addView(frameLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM, authorButton == null ? 0:32, 0, 48, 0));
 
         for (int a = 0; a < 2; a++) {
             emojiButton[a] = new ImageView(context) {
@@ -1784,15 +1804,6 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
             }
         }
         setEmojiButtonImage(false, false);
-
-        authorButton = new ImageView(context);
-        authorButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_chat_messagePanelIcons), PorterDuff.Mode.MULTIPLY));
-        authorButton.setImageResource(R.drawable.input_attach);
-        authorButton.setScaleType(ImageView.ScaleType.CENTER);
-        if (Build.VERSION.SDK_INT >= 21) {
-            authorButton.setBackgroundDrawable(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
-        }
-        frameLayout.addView(authorButton, LayoutHelper.createFrame(48, 48, Gravity.BOTTOM | Gravity.LEFT, 3, 0, 0, 0));
 
         captionLimitView = new NumberTextView(context);
         captionLimitView.setVisibility(View.GONE);
@@ -2223,6 +2234,9 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
                 }
                 if (botCommandsMenuContainer != null) {
                     botCommandsMenuContainer.dismiss();
+                }
+                if (authorsMenu != null) {
+                    authorsMenu.dismiss();
                 }
                 checkBotMenu();
             }

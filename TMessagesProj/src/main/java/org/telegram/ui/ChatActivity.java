@@ -278,6 +278,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private int chatActivityEnterViewAnimateFromTop;
     private boolean chatActivityEnterViewAnimateBeforeSending;
     private View timeItem2;
+    private ActionBarPopupWindow authorsMenu;
     private ActionBarMenuItem attachItem;
     private ActionBarMenuItem headerItem;
     private ActionBarMenuItem editTextItem;
@@ -12577,11 +12578,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     if (forwardItem != null) {
                         forwardItem.setEnabled(false);
                         forwardItem.setAlpha(0.5f);
-                        Tooltip tooltip = new Tooltip(contentView.getContext(), contentView, 0xcc111111, Color.WHITE);
                         boolean isChannel = ChatObject.isChannel(currentChat) && !currentChat.megagroup;
                         String msg = isChannel ? LocaleController.getString("ChannelForwardsRestricted", R.string.ChannelForwardsRestricted)
                                 : LocaleController.getString("GroupForwardsRestricted", R.string.GroupForwardsRestricted);
-                        showForwardRestrictionHint((View)forwardItem, msg);
+                        if (forwardRestrictionHintView == null) {
+                            showForwardRestrictionHint((View)forwardItem, msg);
+                        }
                     }
                     if (saveItem != null) {
                         saveItem.setEnabled(false);
@@ -12593,6 +12595,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                 }
             }
+        } else {
+            if (forwardRestrictionHintView != null) {
+                forwardRestrictionHintView.hide();
+            }
+
         }
         if (currentChat != null && currentChat.noforwards) {
             if (forwardButton != null) {
@@ -25741,5 +25748,31 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
             return color;
         }
+    }
+    public void showAuthorsMenu() {
+        int height = chatActivityEnterView.getMeasuredHeight();
+        if (authorsMenu != null) {
+            authorsMenu.showAtLocation(contentView, Gravity.BOTTOM | Gravity.LEFT, 0, height);
+            return;
+        }
+        LinearLayout menuLayout = new LinearLayout(contentView.getContext()) {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent event) {
+                if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0 && authorsMenu != null && authorsMenu.isShowing()) {
+                    authorsMenu.dismiss();
+                }
+                return super.dispatchKeyEvent(event);
+            }
+        };
+        menuLayout.setOrientation(LinearLayout.HORIZONTAL);
+        TextView text = new TextView(contentView.getContext());
+        text.setText(R.string.SendMessageAs);
+        text.setTextSize(AndroidUtilities.dp(8));
+        text.setBackgroundColor(0xffffffff);
+        text.setTextColor(0xff101010);
+        menuLayout.addView(text);
+
+        authorsMenu = new ActionBarPopupWindow(menuLayout, LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT);
+        authorsMenu.showAtLocation(chatActivityEnterView, Gravity.BOTTOM | Gravity.LEFT, 0, 200);
     }
 }
